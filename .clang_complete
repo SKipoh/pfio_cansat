@@ -1,0 +1,30 @@
+-IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/include
+-IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/src
+-IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Servo/src
+-IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/DHT sensor library
+-IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Adafruit Unified Sensor
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/cores/arduino
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/system/libsam
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/system/CMSIS/CMSIS/Include
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/system/CMSIS/Device/ATMEL
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/variants/arduino_due_x
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/HID/src
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src
+-IC:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/Wire/src
+-IC:/Users/jack_/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/arm-none-eabi/include/c++/7.2.1
+-IC:/Users/jack_/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/arm-none-eabi/include/c++/7.2.1/arm-none-eabi
+-IC:/Users/jack_/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/lib/gcc/arm-none-eabi/7.2.1/include
+-IC:/Users/jack_/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/lib/gcc/arm-none-eabi/7.2.1/include-fixed
+-IC:/Users/jack_/.platformio/packages/toolchain-gccarmnoneeabi@1.70201.0/arm-none-eabi/include
+-IC:/Users/jack_/.platformio/packages/tool-unity
+-DPLATFORMIO=50202
+-D__SAM3X8E__
+-DARDUINO_SAM_DUE
+-DARDUINO=10805
+-DF_CPU=84000000L
+-DUSBCON
+-DUSB_VID=0x2341
+-DUSB_PID=0x003E
+-DUSB_PRODUCT="Arduino Due"
+-DUSB_MANUFACTURER="Arduino"
+-DARDUINO_ARCH_SAM
