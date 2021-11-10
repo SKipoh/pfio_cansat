@@ -76,5 +76,5 @@ void loop() {
     Serial2.print("'}");
     Serial2.print("\n");
 
-    delay(10); //Delay 2 sec.
+    delay(799); //Delay 2 sec.
 }
