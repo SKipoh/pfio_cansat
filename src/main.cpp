@@ -1,14 +1,21 @@
 #include <Arduino.h>
-
+#include <SPI.h>
+#include <Wire.h>
 #include <Servo.h>
 #include <DHT.h>
 #include <DHT_U.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_L3GD20_U.h>
+#include <LSM303.h>
 
  /*
  CANsat Release Code
  Servo Movement code that can receive commands over serial
  to move the serial to a from a start and end position
 */
+
+
+//
 #define DHTPIN 7     // what pin we're connected to
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 DHT dht(DHTPIN, DHTTYPE);
