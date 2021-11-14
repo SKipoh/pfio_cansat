@@ -1,6 +1,7 @@
 -IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/include
 -IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/src
 -IC:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src
+-IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/BMP180MI/src
 -IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/LSM303
 -IC:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U
 -IC:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/Wire/src
