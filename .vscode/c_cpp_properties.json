@@ -10,6 +10,11 @@
             "includePath": [
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/include",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/src",
+                "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
+                "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
+                "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/LSM303",
+                "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U",
+                "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/Wire/src",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/Servo/src",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/DHT sensor library",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/Adafruit Unified Sensor",
@@ -23,8 +28,6 @@
                 "C:/Users/jack_/.platformio/lib/Adafruit PCD8544 Nokia 5110 LCD library",
                 "C:/Users/jack_/.platformio/lib/Adafruit SSD1306",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/HID/src",
-                "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
-                "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/Wire/src",
                 "C:/Users/jack_/.platformio/packages/tool-unity",
                 ""
             ],
@@ -33,6 +36,11 @@
                 "path": [
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/include",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/src",
+                    "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
+                    "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
+                    "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/LSM303",
+                    "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U",
+                    "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/Wire/src",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/Servo/src",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/DHT sensor library",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/Adafruit Unified Sensor",
@@ -46,8 +54,6 @@
                     "C:/Users/jack_/.platformio/lib/Adafruit PCD8544 Nokia 5110 LCD library",
                     "C:/Users/jack_/.platformio/lib/Adafruit SSD1306",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/HID/src",
-                    "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
-                    "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/Wire/src",
                     "C:/Users/jack_/.platformio/packages/tool-unity",
                     ""
                 ]
