@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <string.h>
 #include <avr/dtostrf.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -20,7 +21,8 @@
 // Selecting which pin to connect our DHT22 to, and instantiating it
 #define DHTPIN 7
 #define DHTTYPE DHT22
-DHT dht(DHTPIN, DHTTYPE);
+DHT_Unified dht(DHTPIN, DHTTYPE);
+uint32_t delaysMS;
 // Instantiating an instance of Servo (MAX of 12 Servos)
 Servo releaseServo;
 // Defining the I2C addr of the BMP180, and creating an instance of it
@@ -82,22 +84,37 @@ void setup() {
 }
 
 char * getTempData() {
+  Serial.println("Getting DHT22 Data");
   // Store humidity and temp readings
   float hum;
   float temp;
   // char arrays to store our float -> str converison
-  char tempArr[8];
-  char humiArr[8];
+  char tempArr[16];
+  char humiArr[16];
+
+  Serial.println("Init Values");
 
   //Read data and store it to variables hum and temp
-  hum = dht.readHumidity();
-  temp = dht.readTemperature();
+  //hum = dht.readHumidity();
+  //temp = dht.readTemperature();
+
+  // Getting a temperature and humidity event
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+
+  temp = event.temperature;
+  hum = event.relative_humidity;
+
+  Serial.println("Read from Sensors");
+
   //Print temp and humidity values to serial monitor
   strcat(tempHumiJson, "{'temp': '");
   strcat(tempHumiJson, dtostrf(temp, 4, 2, tempArr));
   strcat(tempHumiJson, "', 'humi': '");
   strcat(tempHumiJson, dtostrf(hum, 4, 2, humiArr));
   strcat(tempHumiJson, "'}, ");
+
+  Serial.println("Phat concat in temp");
 
   // Returning the completed format
   // example result: {'temp': 25.74, 'humi': 51.45}
@@ -121,19 +138,25 @@ float calcMag(int reading) {
 // Gets a reading from the LSM303, converts the raw output to milli-G & milli-
 // gauess and returns a partial JSON format string
 char * getLsm() {
+  Serial.println("Getting LSM303 Data");
   // char array to store our int -> str conversions
-  char tmp[16];
+  char tmp[80];
   // Store the Accel and Mag readings
   float accel[2] = {};
   float mag[2] = {};
 
+  Serial.println("Init Values Done");
   // Starting a reading from the sensor
   lsm.read();
+
+  Serial.println("Read from LSM");
 
   // Storing our Accelerometer results
   accel[0] = calcAccel(lsm.a.x);
   accel[0] = calcAccel(lsm.a.y);
   accel[0] = calcAccel(lsm.a.z);
+
+  Serial.println("Calculated acceleration data");
 
   // formatting JSON for the accelerometer readings
   strcat(accelMagJson, "'accel': ");
@@ -145,10 +168,14 @@ char * getLsm() {
   strcat(accelMagJson, dtostrf(accel[2], 5, 3, tmp));
   strcat(accelMagJson, "'}, ");
 
+  Serial.println("Phat concat");
+
   // Storing our Accelerometer results
   mag[0] = calcMag(lsm.m.x);
   mag[0] = calcMag(lsm.m.y);
   mag[0] = calcMag(lsm.m.z);
+
+  Serial.println("Calcualted Mag data");
 
   // formatting the JSON for the magnetometer readings
   strcat(accelMagJson, "'magno': ");
@@ -160,6 +187,8 @@ char * getLsm() {
   strcat(accelMagJson, dtostrf(mag[2], 5, 3, tmp));
   strcat(accelMagJson, "'}, ");
 
+  Serial.println("Phat string concat 2");
+
   return accelMagJson;
 }
 
@@ -167,8 +196,9 @@ char * getLsm() {
 // Gets the x, y, z readings for the L3GD20 Gyroscope in rads/s and returns
 // them as a partial JSON string
 char * getGyro() {
+  Serial.println("Getting L3GD20 Data");
   // char array to store our int -> str conversions
-  char tmp[16];
+  char tmp[80];
 
   // Getting a new sensor event (reading)
   sensors_event_t event;
@@ -188,8 +218,19 @@ char * getGyro() {
 }
 
 char * getBmp() {
+  Serial.println("Getting BMP180 Data");
   // char array to store our int -> str conversions
-  char tmp[16];
+  char tmp[80];
+
+  if (!bmp.measureTemperature())
+	{
+		Serial.println("could not start temperature measurement, is a measurement already running?");
+	}
+
+  do
+	{
+		delay(100);
+	} while (!bmp.hasValue());
 
   // Making a temperature (in degC) & pressure (in Pa) measurement
   bmp.measureTemperature();
@@ -282,10 +323,26 @@ void loop() {
   Serial.println("twat");
 
   // // Taking measurements and returning partial JSON strings
-  //char *dhtDat = getTempData();
+  // char *dhtDat = getTempData();
   // char *accelMagDat = getLsm();
   // char *gyroDat = getGyro();
   // char *bmpDat = getBmp();
+
+  String dhtDat = getTempData();
+  String accelMagDat = getLsm();
+  String gyroDat = getGyro();
+  //String bmpDat = getBmp();
+
+  Serial.println("megatwat");
+  Serial.println(dhtDat);
+  Serial.println(accelMagDat);
+  Serial.println(gyroDat);
+  //Serial.println(bmpDat);
+
+  memset(tempHumiJson, 0, sizeof tempHumiJson);
+  memset(accelMagDat, 0, sizeof accelMagDat);
+  memset(gyroJson, 0, sizeof gyroJson);
+  //memset(bmpJson, 0, sizeof bmpJson);
 
   // // Formatting the strings together for final transmission
   // strcat(completeData, "{ ");
@@ -301,5 +358,5 @@ void loop() {
   // Clearing our char array of results
   //completeData[0] = '\0';
 
-  //delay(799); //Delay 2 sec.
+  delay(2000); //Delay 2 sec.
 }
