@@ -32,20 +32,18 @@ BMP180I2C bmp(I2C_ADDR);
 // Creating an instance of the LSM accelerometer/magnetometer
 LSM303 lsm;
 L3G gyro;
+char DHTreport[80];
 char LSMreport[300];
 char L3Greport[80];
 char BMPreport[160];
+char completeReport[500];
 
 // Store the servo position
 int pos = 0;
 // Storing received bytes
 int stopBytes = 0;
 // Boolean for storing whether or not to read the sensors
-bool readSensors = true;
-
-char tempHumiJson[] = "";
-char accelMagJson[] = "";
-char gyroJson[] = "";
+bool readSensors = false;
 
 void setup() {
   // attaches the servo on pin 13 to the servo object
@@ -77,36 +75,24 @@ void setup() {
     Serial.println("Failed to autodetect gyro type!");
     while (1);
   }
+
+  Serial.println("CANsat Ready to Transmit!");
 }
 
-char * getTempData() {
-  Serial.println("Getting DHT22 Data");
+void getTempData() {
   // Store humidity and temp readings
   float hum;
   float temp;
-  // char arrays to store our float -> str converison
-  char tempArr[16];
-  char humiArr[16];
 
+  // Taking our DHT readings
   temp = dht.readTemperature();
   hum = dht.readHumidity();
 
-  Serial.print("Temp: ");
-  Serial.println(temp);
-  Serial.print("Humidity: ");
-  Serial.println(hum);
+  // Formatting the results into the DHT22 report as a partial JSON
+  snprintf(DHTreport, sizeof(DHTreport), "'tempHumi': {'temp': %.2f, 'humidity': %.2f}, ",
+    temp, hum);
 
-
-  //Print temp and humidity values to serial monitor
-  // strcat(tempHumiJson, "{'temp': '");
-  // strcat(tempHumiJson, dtostrf(temp, 4, 2, tempArr));
-  // strcat(tempHumiJson, "', 'humi': '");
-  // strcat(tempHumiJson, dtostrf(hum, 4, 2, humiArr));
-  // strcat(tempHumiJson, "'}, ");
-
-  // Returning the completed format
-  // example result: {'temp': 25.74, 'humi': 51.45}
-  return tempHumiJson;
+  // example result: 'tempHumi': { 'temp': 25.43, 'humidity': 65.67 },
 }
 
 // Taking in our raw 16-bit number reading and converts to mg (milli-G)
@@ -141,8 +127,6 @@ void getAccel() {
   snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
     accel[0], accel[1], accel[2],
     mag[0], mag[1], mag[2]);
-
-  Serial.println(LSMreport);
 }
 
 float calcGyro(int reading) {
@@ -163,7 +147,6 @@ void getGyro() {
   snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
     gyroReadings[0], gyroReadings[1], gyroReadings[2]);
   
-  Serial.println(L3Greport);
 }
 
 void getBmp() {
@@ -194,19 +177,11 @@ void getBmp() {
   // Storing our gotten measurement
 	readings[1] = bmp.getPressure();
 
-  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'pressure': %.2f, 'temp': %.2f}", readings[0], readings[1]);
+  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'temp': %.2f, 'pressure': %.2f}", readings[0], readings[1]);
 
-  Serial.println(BMPreport);
 }
 
 void loop() {
-
-  // result strings that we store globablly due to scope fuckery for all the
-  // formatted sensor outputs
-  // char tempHumiJson[] = "";
-  // char accelMagJson[] = "";
-  //char bmpJson[] = "";
-  //char completeData[] = "";
 
   // Checking if the Serial Port is available to use
   if (Serial.available()) {
@@ -244,11 +219,17 @@ void loop() {
 
   // We check if we are supposed to be reading our sensors
   if (readSensors) {
+    getTempData();
+    delay(100);
     getAccel();
     delay(100);
     getGyro();
     delay(100);
     getBmp();
+
+    snprintf(completeReport, sizeof(completeReport), "{ %s %s %s %s }", DHTreport, LSMreport, L3Greport, BMPreport);
+
+    Serial.println(completeReport);
   }
 
   // Making up the time for an approx. 1 second loop
