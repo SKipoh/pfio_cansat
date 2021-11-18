@@ -10,6 +10,7 @@
             "includePath": [
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/include",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/src",
+                "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/SD",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/L3G",
                 "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
@@ -37,6 +38,7 @@
                 "path": [
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/include",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/src",
+                    "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/SD",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/L3G",
                     "c:/Users/jack_/Documents/_Code/CANsat/pfio_cansat/.pio/libdeps/due/BMP180MI/src",

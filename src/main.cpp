@@ -2,6 +2,7 @@
 #include <string.h>
 #include <avr/dtostrf.h>
 #include <SPI.h>
+#include <SD.h>
 #include <Wire.h>
 #include <Servo.h>
 #include <DHT.h>
@@ -28,6 +29,9 @@ Servo releaseServo;
 // Defining the I2C addr of the BMP180, and creating an instance of it
 #define I2C_ADDR 0x77
 BMP180I2C bmp(I2C_ADDR);
+
+// Choosing our CS pin for the SD card reader
+#define CS 8
 
 // Creating an instance of the LSM accelerometer/magnetometer
 LSM303 lsm;
@@ -58,10 +62,12 @@ void setup() {
   dht.begin();
   // Starting up the SPI interface
   Wire.begin();
+  // Selecting our SD card reader Chip Select Pin
+  pinMode(CS, OUTPUT);
 
   if (!bmp.begin()) {
     Serial.println("BMP180 begin() failed, check interface & I2C address");
-    while(1);
+    //while(1);
   }
   // Resetting the BMP with default values & setting it to take high-res measurements
   bmp.resetToDefaults();
@@ -73,7 +79,11 @@ void setup() {
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
-    while (1);
+    //while (1);
+  }
+
+  if (!SD.begin(CS)) {
+    Serial.println("SD card absent");
   }
 
   Serial.println("CANsat Ready to Transmit!");
@@ -89,7 +99,7 @@ void getTempData() {
   hum = dht.readHumidity();
 
   // Formatting the results into the DHT22 report as a partial JSON
-  snprintf(DHTreport, sizeof(DHTreport), "'tempHumi': {'temp': %.2f, 'humidity': %.2f}, ",
+  snprintf(DHTreport, sizeof(DHTreport), "'tempHumi': {'temp': %.2f, 'humidity': %.2f}",
     temp, hum);
 
   // example result: 'tempHumi': { 'temp': 25.43, 'humidity': 65.67 },
@@ -124,7 +134,7 @@ void getAccel() {
   mag[1] = calcMag(lsm.m.y);
   mag[2] = calcMag(lsm.m.z);
 
-  snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
+  snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}",
     accel[0], accel[1], accel[2],
     mag[0], mag[1], mag[2]);
 }
@@ -144,7 +154,7 @@ void getGyro() {
   gyroReadings[1] = calcGyro(gyro.g.y);
   gyroReadings[2] = calcGyro(gyro.g.z);
 
-  snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
+  snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}",
     gyroReadings[0], gyroReadings[1], gyroReadings[2]);
   
 }
@@ -221,15 +231,23 @@ void loop() {
   if (readSensors) {
     getTempData();
     delay(100);
-    getAccel();
-    delay(100);
-    getGyro();
-    delay(100);
-    getBmp();
+    //getAccel();
+    //delay(100);
+    //getGyro();
+    //delay(100);
+    //getBmp();
 
-    snprintf(completeReport, sizeof(completeReport), "{ %s %s %s %s }", DHTreport, LSMreport, L3Greport, BMPreport);
+    snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
 
-    Serial.println(completeReport);
+    //Serial.println(completeReport);
+
+    File file = SD.open("datalog.txt", FILE_WRITE);
+    // Checking if the file is available
+    if (file) {
+      file.write(completeReport);
+      file.close();
+      Serial.println("Written Report to SD");
+    }
   }
 
   // Making up the time for an approx. 1 second loop
