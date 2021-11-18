@@ -11,7 +11,6 @@
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/include",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/src",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
-                "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/L3G",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/LSM303",
@@ -24,6 +23,7 @@
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/system/CMSIS/CMSIS/Include",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/system/CMSIS/Device/ATMEL",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/variants/arduino_due_x",
+                "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/HID/src",
                 "C:/Users/jack_/.platformio/packages/tool-unity",
                 ""
@@ -34,7 +34,6 @@
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/include",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/src",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
-                    "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/L3G",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/LSM303",
@@ -47,6 +46,7 @@
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/system/CMSIS/CMSIS/Include",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/system/CMSIS/Device/ATMEL",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/variants/arduino_due_x",
+                    "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/Adafruit L3GD20 U",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/HID/src",
                     "C:/Users/jack_/.platformio/packages/tool-unity",
                     ""
