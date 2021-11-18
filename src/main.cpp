@@ -2,6 +2,7 @@
 #include <string.h>
 #include <avr/dtostrf.h>
 #include <SPI.h>
+#include <SD.h>
 #include <Wire.h>
 #include <Servo.h>
 #include <DHT.h>
@@ -29,20 +30,29 @@ Servo releaseServo;
 #define I2C_ADDR 0x77
 BMP180I2C bmp(I2C_ADDR);
 
+// Choosing our CS pin for the SD card reader
+#define CS 8
+
 // Creating an instance of the LSM accelerometer/magnetometer
 LSM303 lsm;
 L3G gyro;
+char DHTreport[80];
 char LSMreport[300];
 char L3Greport[80];
 char BMPreport[160];
+char completeReport[500];
 
 // Store the servo position
 int pos = 0;
 // Storing received bytes
 int stopBytes = 0;
 // Boolean for storing whether or not to read the sensors
+<<<<<<< HEAD
 bool readSensors = true;
 
+=======
+bool readSensors = false;
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
 
 void setup() {
   // attaches the servo on pin 13 to the servo object
@@ -52,14 +62,16 @@ void setup() {
   // Opening the Serial connection to the host
   Serial.begin(9600);
   // Opening Serial Connection to the radio
-  //Serial2.begin(9600);
+  Serial2.begin(9600);
   // Opening a connection to the DHT22
   dht.begin();
   // Starting up the SPI interface
   Wire.begin();
+  // Selecting our SD card reader Chip Select Pin
+  pinMode(CS, OUTPUT);
 
   if (!bmp.begin()) {
-    Serial.println("BMP180 begin() failed, check interface & I2C address");
+    Serial2.println("BMP180 begin() failed, check interface & I2C address");
     while(1);
   }
   // Resetting the BMP with default values & setting it to take high-res measurements
@@ -71,11 +83,18 @@ void setup() {
 
   if (!gyro.init())
   {
-    Serial.println("Failed to autodetect gyro type!");
+    Serial2.println("Failed to autodetect gyro type!");
     while (1);
   }
+
+  if (!SD.begin(CS)) {
+    Serial2.println("SD card absent");
+  }
+
+  Serial2.println("CANsat Ready to Transmit!");
 }
 
+<<<<<<< HEAD
 // char * getTempData() {
 //   Serial.println("Getting DHT22 Data");
 //   // Store humidity and temp readings
@@ -105,6 +124,23 @@ void setup() {
 //   // example result: {'temp': 25.74, 'humi': 51.45}
 //   return tempHumiJson;
 // }
+=======
+void getTempData() {
+  // Store humidity and temp readings
+  float hum;
+  float temp;
+
+  // Taking our DHT readings
+  temp = dht.readTemperature();
+  hum = dht.readHumidity();
+
+  // Formatting the results into the DHT22 report as a partial JSON
+  snprintf(DHTreport, sizeof(DHTreport), "'tempHumi': {'temp': %.2f, 'humidity': %.2f}",
+    temp, hum);
+
+  // example result: 'tempHumi': { 'temp': 25.43, 'humidity': 65.67 },
+}
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
 
 // Taking in our raw 16-bit number reading and converts to mg (milli-G)
 float calcAccel(int reading) {
@@ -135,11 +171,14 @@ char * getAccel() {
   mag[1] = calcMag(lsm.m.y);
   mag[2] = calcMag(lsm.m.z);
 
-  snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
+  snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}",
     accel[0], accel[1], accel[2],
     mag[0], mag[1], mag[2]);
+<<<<<<< HEAD
 
   return LSMreport;
+=======
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
 }
 
 float calcGyro(int reading) {
@@ -157,10 +196,13 @@ char * getGyro() {
   gyroReadings[1] = calcGyro(gyro.g.y);
   gyroReadings[2] = calcGyro(gyro.g.z);
 
-  snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
+  snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}",
     gyroReadings[0], gyroReadings[1], gyroReadings[2]);
   
+<<<<<<< HEAD
   return L3Greport;
+=======
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
 }
 
 char * getBmp() {
@@ -191,13 +233,17 @@ char * getBmp() {
   // Storing our gotten measurement
 	readings[1] = bmp.getPressure();
 
-  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'pressure': %.2f, 'temp': %.2f}", readings[0], readings[1]);
+  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'temp': %.2f, 'pressure': %.2f}", readings[0], readings[1]);
 
+<<<<<<< HEAD
   return BMPreport;
+=======
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
 }
 
 void loop() {
 
+<<<<<<< HEAD
   // result strings that we store globablly due to scope fuckery for all the
   // formatted sensor outputs
   char tempHumiJson[] = "";
@@ -205,10 +251,12 @@ void loop() {
   char gyroJson[] = "";
   char bmpJson[] = "";
 
+=======
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
   // Checking if the Serial Port is available to use
-  if (Serial.available()) {
+  if (Serial2.available()) {
     // Reading in any bytes and storing them
-    stopBytes = Serial.read();
+    stopBytes = Serial2.read();
     // If we receive an ASCII "a", that is the command
     // to move to the start position and then stop
     if (stopBytes == 97) {
@@ -241,19 +289,43 @@ void loop() {
 
   // We check if we are supposed to be reading our sensors
   if (readSensors) {
+<<<<<<< HEAD
     char completeReport[400];
 
     // char tempHumiJson[] = "";
     strcpy(accelMagJson, getAccel());
+=======
+    getTempData();
+    delay(100);
+    getAccel();
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
     delay(100);
     strcpy(gyroJson, getGyro());
     delay(100);
+<<<<<<< HEAD
     strcpy(bmpJson, getBmp());
 
     snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s }", accelMagJson, gyroJson, bmpJson);
 
     Serial.println(completeReport);
 
+=======
+    getBmp();
+
+    snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
+
+    //Serial.println(completeReport);
+
+    File file = SD.open("datalog.txt", FILE_WRITE);
+    // Checking if the file is available
+    if (file) {
+      file.write(completeReport);
+      file.close();
+      Serial2.println("Written Report to SD");
+    }
+
+    Serial2.println(completeReport);
+>>>>>>> ef981fec1de7a1b25baf9a5b71b4d2aed52fc89f
   }
 
   // Making up the time for an approx. 1 second loop

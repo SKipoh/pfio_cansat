@@ -10,6 +10,7 @@
             "includePath": [
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/include",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/src",
+                "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/SD",
                 "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/L3G",
                 "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
@@ -33,6 +34,7 @@
                 "path": [
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/include",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/src",
+                    "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/SD",
                     "C:/Users/jack_/.platformio/packages/framework-arduino-sam/libraries/SPI/src",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/L3G",
                     "C:/Users/jack_/Documents/_Code/CANsat/Payload Code/cansat_arduino/payload/pfio_cansat/.pio/libdeps/due/BMP180MI/src",
