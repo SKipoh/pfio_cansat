@@ -7,8 +7,8 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_L3GD20_U.h>
 #include <LSM303.h>
+#include <L3G.h>
 #include <BMP180I2C.h>
 
  /*
@@ -21,17 +21,20 @@
 // Selecting which pin to connect our DHT22 to, and instantiating it
 #define DHTPIN 7
 #define DHTTYPE DHT22
-DHT_Unified dht(DHTPIN, DHTTYPE);
-uint32_t delaysMS;
+DHT dht(DHTPIN, DHTTYPE);
+
 // Instantiating an instance of Servo (MAX of 12 Servos)
 Servo releaseServo;
 // Defining the I2C addr of the BMP180, and creating an instance of it
 #define I2C_ADDR 0x77
 BMP180I2C bmp(I2C_ADDR);
+
 // Creating an instance of the LSM accelerometer/magnetometer
 LSM303 lsm;
-// Creating an instance of our L3GD20 Gyro
-Adafruit_L3GD20_Unified gyro = Adafruit_L3GD20_Unified(20);
+L3G gyro;
+char LSMreport[300];
+char L3Greport[80];
+char BMPreport[160];
 
 // Store the servo position
 int pos = 0;
@@ -39,14 +42,10 @@ int pos = 0;
 int stopBytes = 0;
 // Boolean for storing whether or not to read the sensors
 bool readSensors = true;
-// result strings that we store globablly due to scope fuckery for all the
-// formatted sensor outputs
+
 char tempHumiJson[] = "";
 char accelMagJson[] = "";
 char gyroJson[] = "";
-char bmpJson[] = "";
-char completeData[] = "";
-
 
 void setup() {
   // attaches the servo on pin 13 to the servo object
@@ -70,16 +69,13 @@ void setup() {
   bmp.resetToDefaults();
   bmp.setSamplingMode(BMP180MI::MODE_UHR);
 
-  // Starting up the LSM303 Accel/Mag sensor and enabled defaults (scale +/- 4G)
   lsm.init();
   lsm.enableDefault();
 
-  // Setting the Gyro the auto-range mode
-  gyro.enableAutoRange(true);
-  // Trying to open a connection to the gyro
-  if (!gyro.begin()) {
-    Serial.println("NO L3GD20 Detected! Check wiring...");
-    while(1);
+  if (!gyro.init())
+  {
+    Serial.println("Failed to autodetect gyro type!");
+    while (1);
   }
 }
 
@@ -92,29 +88,21 @@ char * getTempData() {
   char tempArr[16];
   char humiArr[16];
 
-  Serial.println("Init Values");
+  temp = dht.readTemperature();
+  hum = dht.readHumidity();
 
-  //Read data and store it to variables hum and temp
-  //hum = dht.readHumidity();
-  //temp = dht.readTemperature();
+  Serial.print("Temp: ");
+  Serial.println(temp);
+  Serial.print("Humidity: ");
+  Serial.println(hum);
 
-  // Getting a temperature and humidity event
-  sensors_event_t event;
-  dht.temperature().getEvent(&event);
-
-  temp = event.temperature;
-  hum = event.relative_humidity;
-
-  Serial.println("Read from Sensors");
 
   //Print temp and humidity values to serial monitor
-  strcat(tempHumiJson, "{'temp': '");
-  strcat(tempHumiJson, dtostrf(temp, 4, 2, tempArr));
-  strcat(tempHumiJson, "', 'humi': '");
-  strcat(tempHumiJson, dtostrf(hum, 4, 2, humiArr));
-  strcat(tempHumiJson, "'}, ");
-
-  Serial.println("Phat concat in temp");
+  // strcat(tempHumiJson, "{'temp': '");
+  // strcat(tempHumiJson, dtostrf(temp, 4, 2, tempArr));
+  // strcat(tempHumiJson, "', 'humi': '");
+  // strcat(tempHumiJson, dtostrf(hum, 4, 2, humiArr));
+  // strcat(tempHumiJson, "'}, ");
 
   // Returning the completed format
   // example result: {'temp': 25.74, 'humi': 51.45}
@@ -123,240 +111,146 @@ char * getTempData() {
 
 // Taking in our raw 16-bit number reading and converts to mg (milli-G)
 float calcAccel(int reading) {
-  reading = reading >> 4;
-  reading = reading * 0.061;
-  return reading;
+  float correctedReading = reading >> 4;
+  correctedReading = correctedReading * 0.061;
+  return correctedReading;
 }
 
 // Taking in our raw 16-bit Magnetometer reading and converts to mgauss (milli-Gauss)
 float calcMag(int reading) {
-  reading = reading >> 4;
-  reading = reading * 0.061;
-  return reading;
+  float correctedReading = reading * 0.16;
+  return correctedReading;
 }
 
-// Gets a reading from the LSM303, converts the raw output to milli-G & milli-
-// gauess and returns a partial JSON format string
-char * getLsm() {
-  Serial.println("Getting LSM303 Data");
-  // char array to store our int -> str conversions
-  char tmp[80];
-  // Store the Accel and Mag readings
+// Getting the measurements from the LSM303 Accel/Magno Sensor and outputting them
+void getAccel() {
+  lsm.read();
+
   float accel[2] = {};
   float mag[2] = {};
 
-  Serial.println("Init Values Done");
-  // Starting a reading from the sensor
-  lsm.read();
-
-  Serial.println("Read from LSM");
-
-  // Storing our Accelerometer results
+  // Taking our 16-bit numbers and turning them into useful output
   accel[0] = calcAccel(lsm.a.x);
-  accel[0] = calcAccel(lsm.a.y);
-  accel[0] = calcAccel(lsm.a.z);
+  accel[1] = calcAccel(lsm.a.y);
+  accel[2] = calcAccel(lsm.a.z);
 
-  Serial.println("Calculated acceleration data");
-
-  // formatting JSON for the accelerometer readings
-  strcat(accelMagJson, "'accel': ");
-  strcat(accelMagJson, "{'x': '");
-  strcat(accelMagJson, dtostrf(accel[0], 5, 3, tmp));
-  strcat(accelMagJson, "', 'y': '");
-  strcat(accelMagJson, dtostrf(accel[1], 5, 3, tmp));
-  strcat(accelMagJson, "', 'z': '");
-  strcat(accelMagJson, dtostrf(accel[2], 5, 3, tmp));
-  strcat(accelMagJson, "'}, ");
-
-  Serial.println("Phat concat");
-
-  // Storing our Accelerometer results
   mag[0] = calcMag(lsm.m.x);
-  mag[0] = calcMag(lsm.m.y);
-  mag[0] = calcMag(lsm.m.z);
+  mag[1] = calcMag(lsm.m.y);
+  mag[2] = calcMag(lsm.m.z);
 
-  Serial.println("Calcualted Mag data");
+  snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
+    accel[0], accel[1], accel[2],
+    mag[0], mag[1], mag[2]);
 
-  // formatting the JSON for the magnetometer readings
-  strcat(accelMagJson, "'magno': ");
-  strcat(accelMagJson, "{'x': '");
-  strcat(accelMagJson, dtostrf(mag[0], 5, 3, tmp));
-  strcat(accelMagJson, "', 'y': '");
-  strcat(accelMagJson, dtostrf(mag[1], 5, 3, tmp));
-  strcat(accelMagJson, "', 'z': '");
-  strcat(accelMagJson, dtostrf(mag[2], 5, 3, tmp));
-  strcat(accelMagJson, "'}, ");
-
-  Serial.println("Phat string concat 2");
-
-  return accelMagJson;
+  Serial.println(LSMreport);
 }
 
-
-// Gets the x, y, z readings for the L3GD20 Gyroscope in rads/s and returns
-// them as a partial JSON string
-char * getGyro() {
-  Serial.println("Getting L3GD20 Data");
-  // char array to store our int -> str conversions
-  char tmp[80];
-
-  // Getting a new sensor event (reading)
-  sensors_event_t event;
-  gyro.getEvent(&event);
-
-  // Reading our results in and formatting it into a partial JSON
-  strcat(gyroJson, "'gyro': ");
-  strcat(gyroJson, "{'x': '");
-  strcat(gyroJson, dtostrf(event.gyro.x, 3, 2, tmp));
-  strcat(gyroJson, "', 'y': '");
-  strcat(gyroJson, dtostrf(event.gyro.y, 3, 2, tmp));
-  strcat(gyroJson, "', 'z': '");
-  strcat(gyroJson, dtostrf(event.gyro.z, 3, 2, tmp));
-  strcat(gyroJson, "'}, ");
-
-  return gyroJson;
+float calcGyro(int reading) {
+  reading = reading * 8.75;
+  reading = reading / 1000;
+  return reading;
 }
 
-char * getBmp() {
-  Serial.println("Getting BMP180 Data");
-  // char array to store our int -> str conversions
-  char tmp[80];
+void getGyro() {
+  gyro.read();
 
-  if (!bmp.measureTemperature())
-	{
-		Serial.println("could not start temperature measurement, is a measurement already running?");
-	}
+  float gyroReadings[2] = {};
 
-  do
+  gyroReadings[0] = calcGyro(gyro.g.x);
+  gyroReadings[1] = calcGyro(gyro.g.y);
+  gyroReadings[2] = calcGyro(gyro.g.z);
+
+  snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}, ",
+    gyroReadings[0], gyroReadings[1], gyroReadings[2]);
+  
+  Serial.println(L3Greport);
+}
+
+void getBmp() {
+  float readings[1] = {};
+
+  //start a temperature measurement
+	bmp.measureTemperature();
+
+	//wait for the measurement to finish. proceed as soon as hasValue() returned true. 
+	do
 	{
 		delay(100);
 	} while (!bmp.hasValue());
 
-  // Making a temperature (in degC) & pressure (in Pa) measurement
-  bmp.measureTemperature();
-  bmp.measurePressure();
+  // Storing our gotten measurement
+	readings[0] = bmp.getTemperature();
 
-  // Reading our results and formatting into a partial JSON
-  strcat(bmpJson, "'pressTemp': ");
-  strcat(bmpJson, "{'temp': '");
-  strcat(bmpJson, dtostrf(bmp.getTemperature(), 4, 2, tmp));
-  strcat(bmpJson, "', 'press': '");
-  strcat(bmpJson, dtostrf(bmp.getPressure(), 4, 2, tmp));
-  strcat(bmpJson, "'}");
+	//start a pressure measurement. pressure measurements depend on temperature measurement, you should only start a pressure 
+	//measurement immediately after a temperature measurement. 
+	bmp.measurePressure();
 
-  return bmpJson;
-}
+	//wait for the measurement to finish. proceed as soon as hasValue() returned true. 
+	do
+	{
+		delay(100);
+	} while (!bmp.hasValue());
 
-void readInput() {
-  // Checking if the Serial Port is available to use
-  if (Serial.available()) {
-    // Reading in any bytes and storing them
-    stopBytes = Serial2.read();
-    // If we receive an ASCII "a", that is the command
-    // to move to the start position and then stop
+  // Storing our gotten measurement
+	readings[1] = bmp.getPressure();
 
-    switch (stopBytes) {
-      // If we receive an ASCII "a", we tell the servo the open, and release
-      // the CANsat
-      case 97:
-        if (pos < 90) {
-          for (pos = 0; pos <=90; pos++) {
-            releaseServo.write(pos);
-            delay(1);
-          }
-        }
-        // Clearing stopBytes
-        stopBytes = 0;
-        break;
-      // If we recieve an ASCII "b", we reset the servo to the start position
-      case 98:
-        if (stopBytes == 98) {
-          releaseServo.write(0);
-          // Resetting pos to 0
-          pos = 0;
-          // Clearing stopBytes
-          stopBytes = 0;
-        }
-      // If we receive an ASCII "c", we toggle the sensor reading on/off
-      case 99:
-        readSensors = !readSensors;
-        stopBytes = 0;
-        break;
-      }
-  }
+  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'pressure': %.2f, 'temp': %.2f}", readings[0], readings[1]);
+
+  Serial.println(BMPreport);
 }
 
 void loop() {
-  // First thing we do is read in any input from the Ground Station and do something
-  // with it
-  //readInput();
-  //
+
+  // result strings that we store globablly due to scope fuckery for all the
+  // formatted sensor outputs
+  // char tempHumiJson[] = "";
+  // char accelMagJson[] = "";
+  //char bmpJson[] = "";
+  //char completeData[] = "";
+
   // Checking if the Serial Port is available to use
-  // if (Serial.available()) {
-  //   // Reading in any bytes and storing them
-  //   stopBytes = Serial.read();
-  //   // If we receive an ASCII "a", that is the command
-  //   // to move to the start position and then stop
-  //   if (stopBytes == 97) {
-  //     if (pos < 90) {
-  //       for (pos = 0; pos <=90; pos++) {
-  //         releaseServo.write(pos);
-  //         delay(1);
-  //       }
-  //     }
-  //   // Clearing stopBytes
-  //   stopBytes = 0;
-  //   }
-  //   // If the Byte we receive is an ASCII "b", we move back to
-  //   // the start position
-  //   if (stopBytes == 98) {
-  //     releaseServo.write(0);
-  //     // Resetting pos to 0
-  //     pos = 0;
-  //     // Clearing stopBytes
-  //     stopBytes = 0;
-  //   }
-  // }
+  if (Serial.available()) {
+    // Reading in any bytes and storing them
+    stopBytes = Serial.read();
+    // If we receive an ASCII "a", that is the command
+    // to move to the start position and then stop
+    if (stopBytes == 97) {
+      if (pos < 90) {
+        for (pos = 0; pos <=90; pos++) {
+          releaseServo.write(pos);
+          delay(1);
+        }
+      }
+    // Clearing stopBytes
+    stopBytes = 0;
+    }
+    // If the Byte we receive is an ASCII "b", we move back to
+    // the start position
+    if (stopBytes == 98) {
+      releaseServo.write(0);
+      // Resetting pos to 0
+      pos = 0;
+      // Clearing stopBytes
+      stopBytes = 0;
+    }
+    // If the byte received is an ASCII "c", we toggle the sensor readings
+    if (stopBytes == 99) {
+      // We toggle the readSensors bool to start or stop our sensor readings
+      readSensors = !readSensors;
+      // Clearing the stop bytes var
+      stopBytes = 0;
+    }
+  }
 
-  delay(200);
+  // We check if we are supposed to be reading our sensors
+  if (readSensors) {
+    getAccel();
+    delay(100);
+    getGyro();
+    delay(100);
+    getBmp();
+  }
 
-  Serial.println("twat");
-
-  // // Taking measurements and returning partial JSON strings
-  // char *dhtDat = getTempData();
-  // char *accelMagDat = getLsm();
-  // char *gyroDat = getGyro();
-  // char *bmpDat = getBmp();
-
-  String dhtDat = getTempData();
-  String accelMagDat = getLsm();
-  String gyroDat = getGyro();
-  //String bmpDat = getBmp();
-
-  Serial.println("megatwat");
-  Serial.println(dhtDat);
-  Serial.println(accelMagDat);
-  Serial.println(gyroDat);
-  //Serial.println(bmpDat);
-
-  memset(tempHumiJson, 0, sizeof tempHumiJson);
-  memset(accelMagDat, 0, sizeof accelMagDat);
-  memset(gyroJson, 0, sizeof gyroJson);
-  //memset(bmpJson, 0, sizeof bmpJson);
-
-  // // Formatting the strings together for final transmission
-  // strcat(completeData, "{ ");
-  //strcat(completeData, dhtDat);
-  // strcat(completeData, accelMagDat);
-  // strcat(completeData, gyroDat);
-  // strcat(completeData, bmpDat);
-  // strcat(completeData, "}");
-
-  // Outputting the data over the radio and local serial port
-  //Serial.println(completeData);
-
-  // Clearing our char array of results
-  //completeData[0] = '\0';
-
-  delay(2000); //Delay 2 sec.
+  // Making up the time for an approx. 1 second loop
+  delay(300); //Delay 1 sec.
 }
