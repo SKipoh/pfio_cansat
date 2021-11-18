@@ -231,11 +231,11 @@ void loop() {
   if (readSensors) {
     getTempData();
     delay(100);
-    //getAccel();
-    //delay(100);
-    //getGyro();
-    //delay(100);
-    //getBmp();
+    getAccel();
+    delay(100);
+    getGyro();
+    delay(100);
+    getBmp();
 
     snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
 
