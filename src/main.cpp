@@ -57,7 +57,7 @@ void setup() {
   // Opening the Serial connection to the host
   Serial.begin(9600);
   // Opening Serial Connection to the radio
-  //Serial2.begin(9600);
+  Serial2.begin(9600);
   // Opening a connection to the DHT22
   dht.begin();
   // Starting up the SPI interface
@@ -66,8 +66,8 @@ void setup() {
   pinMode(CS, OUTPUT);
 
   if (!bmp.begin()) {
-    Serial.println("BMP180 begin() failed, check interface & I2C address");
-    //while(1);
+    Serial2.println("BMP180 begin() failed, check interface & I2C address");
+    while(1);
   }
   // Resetting the BMP with default values & setting it to take high-res measurements
   bmp.resetToDefaults();
@@ -78,15 +78,15 @@ void setup() {
 
   if (!gyro.init())
   {
-    Serial.println("Failed to autodetect gyro type!");
-    //while (1);
+    Serial2.println("Failed to autodetect gyro type!");
+    while (1);
   }
 
   if (!SD.begin(CS)) {
-    Serial.println("SD card absent");
+    Serial2.println("SD card absent");
   }
 
-  Serial.println("CANsat Ready to Transmit!");
+  Serial2.println("CANsat Ready to Transmit!");
 }
 
 void getTempData() {
@@ -194,9 +194,9 @@ void getBmp() {
 void loop() {
 
   // Checking if the Serial Port is available to use
-  if (Serial.available()) {
+  if (Serial2.available()) {
     // Reading in any bytes and storing them
-    stopBytes = Serial.read();
+    stopBytes = Serial2.read();
     // If we receive an ASCII "a", that is the command
     // to move to the start position and then stop
     if (stopBytes == 97) {
@@ -246,8 +246,10 @@ void loop() {
     if (file) {
       file.write(completeReport);
       file.close();
-      Serial.println("Written Report to SD");
+      Serial2.println("Written Report to SD");
     }
+
+    Serial2.println(completeReport);
   }
 
   // Making up the time for an approx. 1 second loop
