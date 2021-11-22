@@ -230,11 +230,11 @@ void loop() {
   if (readSensors) {
     getTempData();
     delay(100);
-    // getAccel();
-    // delay(100);
-    // getGyro();
-    // delay(100);
-    // getBmp();
+    getAccel();
+    delay(100);
+    getGyro();
+    delay(100);
+    getBmp();
 
     snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
 
@@ -246,9 +246,11 @@ void loop() {
       file.write(completeReport);
       file.close();
       Serial.println("Written Report to SD");
+      Serial2.println("Written Report to SD");
     }
 
     Serial.println(completeReport);
+    Serial2.println(completeReport);
   }
 
   // Making up the time for an approx. 1 second loop
