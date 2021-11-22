@@ -66,7 +66,7 @@ void setup() {
   pinMode(CS, OUTPUT);
 
   if (!bmp.begin()) {
-    Serial2.println("BMP180 begin() failed, check interface & I2C address");
+    Serial.println("BMP180 begin() failed, check interface & I2C address");
     while(1);
   }
   // Resetting the BMP with default values & setting it to take high-res measurements
@@ -78,15 +78,15 @@ void setup() {
 
   if (!gyro.init())
   {
-    Serial2.println("Failed to autodetect gyro type!");
+    Serial.println("Failed to autodetect gyro type!");
     while (1);
   }
 
   if (!SD.begin(CS)) {
-    Serial2.println("SD card absent");
+    Serial.println("SD card absent");
   }
 
-  Serial2.println("CANsat Ready to Transmit!");
+  Serial.println("CANsat Ready to Transmit!");
 }
 
 void getTempData() {
@@ -119,7 +119,7 @@ float calcMag(int reading) {
 }
 
 // Getting the measurements from the LSM303 Accel/Magno Sensor and outputting them
-char * getAccel() {
+void getAccel() {
   lsm.read();
 
   float accel[2] = {};
@@ -145,7 +145,7 @@ float calcGyro(int reading) {
   return reading;
 }
 
-char * getGyro() {
+void getGyro() {
   gyro.read();
 
   float gyroReadings[2] = {};
@@ -158,9 +158,83 @@ char * getGyro() {
     gyroReadings[0], gyroReadings[1], gyroReadings[2]);
   
 }
-    strcpy(gyroJson, getGyro());
+
+void getBmp() {
+  float readings[1] = {};
+
+  //start a temperature measurement
+	bmp.measureTemperature();
+
+	//wait for the measurement to finish. proceed as soon as hasValue() returned true. 
+	do
+	{
+		delay(100);
+	} while (!bmp.hasValue());
+
+  // Storing our gotten measurement
+	readings[0] = bmp.getTemperature();
+
+	//start a pressure measurement. pressure measurements depend on temperature measurement, you should only start a pressure 
+	//measurement immediately after a temperature measurement. 
+	bmp.measurePressure();
+
+	//wait for the measurement to finish. proceed as soon as hasValue() returned true. 
+	do
+	{
+		delay(100);
+	} while (!bmp.hasValue());
+
+  // Storing our gotten measurement
+	readings[1] = bmp.getPressure();
+
+  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'temp': %.2f, 'pressure': %.2f}", readings[0], readings[1]);
+
+}
+
+void loop() {
+  // Checking if the Serial Port is available to use
+  if (Serial.available()) {
+    // Reading in any bytes and storing them
+    stopBytes = Serial.read();
+    // If we receive an ASCII "a", that is the command
+    // to move to the start position and then stop
+    if (stopBytes == 97) {
+      if (pos < 90) {
+        for (pos = 0; pos <=90; pos++) {
+          releaseServo.write(pos);
+          delay(1);
+        }
+      }
+    // Clearing stopBytes
+    stopBytes = 0;
+    }
+    // If the Byte we receive is an ASCII "b", we move back to
+    // the start position
+    if (stopBytes == 98) {
+      releaseServo.write(0);
+      // Resetting pos to 0
+      pos = 0;
+      // Clearing stopBytes
+      stopBytes = 0;
+    }
+    // If the byte received is an ASCII "c", we toggle the sensor readings
+    if (stopBytes == 99) {
+      // We toggle the readSensors bool to start or stop our sensor readings
+      readSensors = !readSensors;
+      // Clearing the stop bytes var
+      stopBytes = 0;
+    }
+  }
+
+  // We check if we are supposed to be reading our sensors
+  if (readSensors) {
+    getTempData();
     delay(100);
-    getBmp();
+    // getAccel();
+    // delay(100);
+    // getGyro();
+    // delay(100);
+    // getBmp();
 
     snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
 
@@ -171,10 +245,10 @@ char * getGyro() {
     if (file) {
       file.write(completeReport);
       file.close();
-      Serial2.println("Written Report to SD");
+      Serial.println("Written Report to SD");
     }
 
-    Serial2.println(completeReport);
+    Serial.println(completeReport);
   }
 
   // Making up the time for an approx. 1 second loop
