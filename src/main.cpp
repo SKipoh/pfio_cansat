@@ -87,6 +87,7 @@ void setup() {
   }
 
   Serial.println("CANsat Ready to Transmit!");
+  Serial2.println("CANsat Ready to Transmit Over Radio!");
 }
 
 void getTempData() {
@@ -193,9 +194,9 @@ void getBmp() {
 
 void loop() {
   // Checking if the Serial Port is available to use
-  if (Serial.available()) {
+  if (Serial2.available()) {
     // Reading in any bytes and storing them
-    stopBytes = Serial.read();
+    stopBytes = Serial2.read();
     // If we receive an ASCII "a", that is the command
     // to move to the start position and then stop
     if (stopBytes == 97) {
