@@ -1,6 +1,8 @@
 # CANsat Payload Code for PlatformIO
 
-## Requirements
+This is part of the code needed my implementation of the ESA CANsat Competition. The code is this repo is to be used in conjunction with my other 2 repos for this project [CANsat App]() and [CANsat Ground Station]()
+
+## **Hardware Requirements**
 
 - Arduino Due or Arduino Mega 2560 (Using the mega will require slight modification to the code to use SoftwareSerial)
 - APC220 Radio connected to Serial2 on the Due or pins RX:10, TX:11)
