@@ -67,6 +67,7 @@ void setup() {
 
   if (!bmp.begin()) {
     Serial.println("BMP180 begin() failed, check interface & I2C address");
+    Serial2.println("BMP180 begin() failed, check interface & I2C address");
     while(1);
   }
   // Resetting the BMP with default values & setting it to take high-res measurements
@@ -79,11 +80,13 @@ void setup() {
   if (!gyro.init())
   {
     Serial.println("Failed to autodetect gyro type!");
+    Serial2.println("Failed to autodetect gyro type!");
     while (1);
   }
 
   if (!SD.begin(CS)) {
     Serial.println("SD card absent");
+    Serial2.println("SD card absent!");
   }
 
   Serial.println("CANsat Ready to Transmit!");
@@ -247,7 +250,7 @@ void loop() {
       file.write(completeReport);
       file.close();
       Serial.println("Written Report to SD");
-      Serial2.println("Written Report to SD");
+      //Serial2.println("Written Report to SD");
     }
 
     Serial.println(completeReport);
