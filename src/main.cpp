@@ -203,6 +203,7 @@ void loop() {
     // If we receive an ASCII "a", that is the command
     // to move to the start position and then stop
     if (stopBytes == 97) {
+      Serial.println("### Moving Servo to Release Position!");
       if (pos < 90) {
         for (pos = 0; pos <=90; pos++) {
           releaseServo.write(pos);
@@ -215,6 +216,7 @@ void loop() {
     // If the Byte we receive is an ASCII "b", we move back to
     // the start position
     if (stopBytes == 98) {
+      Serial.println("### Moving Servo to Start Position!");
       releaseServo.write(0);
       // Resetting pos to 0
       pos = 0;
@@ -223,6 +225,7 @@ void loop() {
     }
     // If the byte received is an ASCII "c", we toggle the sensor readings
     if (stopBytes == 99) {
+      Serial.println("### Toggling Sensors!");
       // We toggle the readSensors bool to start or stop our sensor readings
       readSensors = !readSensors;
       // Clearing the stop bytes var
@@ -242,7 +245,7 @@ void loop() {
 
     snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
 
-    //Serial.println(completeReport);
+    Serial.println(completeReport);
 
     File file = SD.open("datalog.txt", FILE_WRITE);
     // Checking if the file is available
@@ -250,7 +253,6 @@ void loop() {
       file.write(completeReport);
       file.close();
       Serial.println("Written Report to SD");
-      //Serial2.println("Written Report to SD");
     }
 
     Serial.println(completeReport);
