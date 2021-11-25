@@ -103,7 +103,7 @@ void getTempData() {
   hum = dht.readHumidity();
 
   // Formatting the results into the DHT22 report as a partial JSON
-  snprintf(DHTreport, sizeof(DHTreport), "'tempHumi': {'temp': %.2f, 'humidity': %.2f}",
+  snprintf(DHTreport, sizeof(DHTreport), "\"tempHumi\": {\"temp\": %.2f, \"humidity\": %.2f}",
     temp, hum);
 
   // example result: 'tempHumi': { 'temp': 25.43, 'humidity': 65.67 },
@@ -138,7 +138,7 @@ void getAccel() {
   mag[1] = calcMag(lsm.m.y);
   mag[2] = calcMag(lsm.m.z);
 
-  snprintf(LSMreport, sizeof(LSMreport), "'accel': {'x': %.3f, 'y': %.3f, 'z': %.3f}, 'magno': {'x': %.3f, 'y': %.3f, 'z': %.3f}",
+  snprintf(LSMreport, sizeof(LSMreport), "\"accel\": {\"x\": %.3f, \"y\": %.3f, \"z\": %.3f}, \"magno\": {\"x\": %.3f, \"y\": %.3f, \"z\": %.3f}",
     accel[0], accel[1], accel[2],
     mag[0], mag[1], mag[2]);
 }
@@ -158,7 +158,7 @@ void getGyro() {
   gyroReadings[1] = calcGyro(gyro.g.y);
   gyroReadings[2] = calcGyro(gyro.g.z);
 
-  snprintf(L3Greport, sizeof(L3Greport), "'gyro': {'x': %.3f, 'y': %.3f, 'z': %.3f}",
+  snprintf(L3Greport, sizeof(L3Greport), "\"gyro\": {\"x\": %.3f, \"y\": %.3f, \"z\": %.3f}",
     gyroReadings[0], gyroReadings[1], gyroReadings[2]);
   
 }
@@ -191,7 +191,7 @@ void getBmp() {
   // Storing our gotten measurement
 	readings[1] = bmp.getPressure();
 
-  snprintf(BMPreport, sizeof(BMPreport), "'pressTemp': {'temp': %.2f, 'pressure': %.2f}", readings[0], readings[1]);
+  snprintf(BMPreport, sizeof(BMPreport), "\"pressTemp\": {\"temp\": %.2f, \"pressure\": %.2f}", readings[0], readings[1]);
 
 }
 
