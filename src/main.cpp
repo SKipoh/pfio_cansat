@@ -90,7 +90,7 @@ void setup() {
   }
 
   Serial.println("CANsat Ready to Transmit!");
-  Serial2.println("CANsat Ready to Transmit Over Radio!");
+  //Serial2.println("CANsat Ready to Transmit Over Radio!");
 }
 
 void getTempData() {
@@ -230,20 +230,22 @@ void loop() {
       readSensors = !readSensors;
       // Clearing the stop bytes var
       stopBytes = 0;
+    } else {
+      Serial.println(stopBytes);
     }
   }
 
   // We check if we are supposed to be reading our sensors
   if (readSensors) {
     getTempData();
-    delay(100);
+    delay(50);
     getAccel();
-    delay(100);
+    delay(50);
     getGyro();
-    delay(100);
+    delay(50);
     getBmp();
 
-    snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }\n", DHTreport, LSMreport, L3Greport, BMPreport);
+    snprintf(completeReport, sizeof(completeReport), "{ %s, %s, %s, %s }", DHTreport, LSMreport, L3Greport, BMPreport);
 
     Serial.println(completeReport);
 
@@ -260,5 +262,5 @@ void loop() {
   }
 
   // Making up the time for an approx. 1 second loop
-  delay(300); //Delay 1 sec.
+  delay(50); //Delay 1 sec.
 }
