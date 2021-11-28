@@ -57,7 +57,7 @@ void setup() {
   // Opening the Serial connection to the host
   Serial.begin(9600);
   // Opening Serial Connection to the radio
-  Serial2.begin(9600);
+  Serial2.begin(2400);
   // Opening a connection to the DHT22
   dht.begin();
   // Starting up the SPI interface
@@ -262,5 +262,5 @@ void loop() {
   }
 
   // Making up the time for an approx. 1 second loop
-  delay(50); //Delay 1 sec.
+  delay(150); //Delay 1 sec
 }
